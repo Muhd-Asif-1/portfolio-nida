@@ -1,4 +1,5 @@
 import Image, { type StaticImageData } from "next/image";
+import { NumberTicker } from "@/components/number-ticker";
 import { profile } from "@/lib/profile";
 import omasLogo from "../../public/brands/Omas Cafeteria.jpeg";
 import rimsLogo from "../../public/brands/rims.png";
@@ -14,7 +15,8 @@ type ProfileIntroProps = {
   photo: StaticImageData;
   stats: readonly {
     label: "projects" | "clients" | "views";
-    value: string;
+    value: number;
+    suffix: string;
   }[];
   bio: string;
   dashboardServices: readonly { title: string; description: string }[];
@@ -51,10 +53,12 @@ export function ProfileIntro({
           Nida Maryam
         </h1>
         <dl className="mt-4 flex flex-wrap gap-x-4 gap-y-2 sm:mt-1">
-          {stats.map(({ label, value }) => (
+          {stats.map(({ label, value, suffix }) => (
             <div key={label} className="flex flex-col gap-1 sm:flex-row">
               <dt className="order-2">{label}</dt>
-              <dd className="order-1 font-semibold">{value}</dd>
+              <dd className="order-1 font-semibold">
+                <NumberTicker value={value} suffix={suffix} />
+              </dd>
             </div>
           ))}
         </dl>

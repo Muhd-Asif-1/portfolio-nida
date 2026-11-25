@@ -10,6 +10,10 @@
     "format": "biome format --write"
   },
   "dependencies": {
+    "@animate-ui/react": "^2.4.6",
+    "@animateicons/react": "^0.13.0",
+    "@floating-ui/react": "^0.27.20",
+    "motion": "^14.14.0",
     "next": "16.4.6",
     "react": "19.3.0",
     "react-dom": "19.3.0"
