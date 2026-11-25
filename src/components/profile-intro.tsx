@@ -16,9 +16,15 @@ type ProfileIntroProps = {
     value: string;
   }[];
   bio: string;
+  dashboardServices: readonly { title: string; description: string }[];
 };
 
-export function ProfileIntro({ photo, stats, bio }: ProfileIntroProps) {
+export function ProfileIntro({
+  photo,
+  stats,
+  bio,
+  dashboardServices,
+}: ProfileIntroProps) {
   return (
     <section
       aria-labelledby="profile-name"
@@ -83,24 +89,62 @@ export function ProfileIntro({ photo, stats, bio }: ProfileIntroProps) {
         </div>
       </div>
 
-      <div className="col-span-2 grid grid-cols-2 gap-2 pb-3 pt-1 sm:pt-6">
-        {/* Destinations will be enabled when the CV and email are supplied. */}
-        <button
-          type="button"
-          disabled
-          title="CV will be added later"
-          className="flex min-h-11 items-center justify-center rounded-xl bg-[#4a5df9] px-5 py-[13px] text-center font-semibold text-white disabled:cursor-default"
+      <div className="col-span-2 pt-1 sm:pt-6">
+        <section
+          aria-labelledby="dashboard-title"
+          className="rounded-xl bg-[#282b33] px-4 py-[14px]"
         >
-          Download CV
-        </button>
-        <button
-          type="button"
-          disabled
-          title="Email address will be added later"
-          className="flex min-h-11 items-center justify-center rounded-xl bg-[#25292e] px-5 py-[13px] text-center font-semibold text-white disabled:cursor-default"
-        >
-          Get in touch
-        </button>
+          <h2
+            id="dashboard-title"
+            className="flex items-center gap-1.5 text-sm font-semibold leading-5"
+          >
+            <svg
+              aria-hidden="true"
+              width="18"
+              height="20"
+              viewBox="0 0 18 20"
+              fill="none"
+              className="shrink-0 text-[#00b85b]"
+            >
+              <path
+                d="M4 15 14 5M4 5h10v10"
+                stroke="currentColor"
+                strokeWidth="1.75"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            What I can help with
+          </h2>
+          <dl className="mt-2 space-y-1.5 text-sm leading-5">
+            {dashboardServices.map(({ title, description }) => (
+              <div key={title}>
+                <dt className="inline font-semibold">{title}: </dt>
+                <dd className="inline text-[#a8a8a8]">{description}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+
+        <div className="mt-2.5 grid grid-cols-2 gap-2 pb-3">
+          {/* Destinations will be enabled when the CV and email are supplied. */}
+          <button
+            type="button"
+            disabled
+            title="CV will be added later"
+            className="flex min-h-11 items-center justify-center rounded-xl bg-[#4a5df9] px-3 py-[13px] text-center font-semibold whitespace-nowrap text-white disabled:cursor-default sm:px-5"
+          >
+            Download CV
+          </button>
+          <button
+            type="button"
+            disabled
+            title="Email address will be added later"
+            className="flex min-h-11 items-center justify-center rounded-xl bg-[#25292e] px-3 py-[13px] text-center font-semibold whitespace-nowrap text-white disabled:cursor-default sm:px-5"
+          >
+            Get in touch
+          </button>
+        </div>
       </div>
     </section>
   );
