@@ -1,15 +1,7 @@
 import Image, { type StaticImageData } from "next/image";
 import { NumberTicker } from "@/components/number-ticker";
+import { WorkedWithAvatars } from "@/components/worked-with-avatars";
 import { profile } from "@/lib/profile";
-import omasLogo from "../../public/brands/Omas Cafeteria.jpeg";
-import rimsLogo from "../../public/brands/rims.png";
-import urbanhubLogo from "../../public/brands/uhb.jpeg";
-
-const brands = [
-  { name: "Urbanhub Innovations", logo: urbanhubLogo },
-  { name: "RIMS", logo: rimsLogo },
-  { name: "Omas Cafeteria", logo: omasLogo },
-] as const;
 
 type ProfileIntroProps = {
   photo: StaticImageData;
@@ -70,22 +62,7 @@ export function ProfileIntro({
         </p>
         <p className="mt-1 whitespace-pre-line text-foreground">{bio}</p>
         <div className="flex items-center pb-1 pt-[14px]">
-          <div className="flex h-9 w-[94px] shrink-0 -space-x-[9px] pr-1">
-            {brands.map(({ name, logo }) => (
-              <div
-                key={name}
-                className="relative size-9 shrink-0 overflow-hidden rounded-full border-2 border-background bg-white"
-              >
-                <Image
-                  src={logo}
-                  alt={name}
-                  fill
-                  sizes="32px"
-                  className="object-contain"
-                />
-              </div>
-            ))}
-          </div>
+          <WorkedWithAvatars />
           <p className="min-w-0">
             Worked with{" "}
             <span className="font-semibold">Urbanhub Innovations</span>,{" "}
