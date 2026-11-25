@@ -1,6 +1,8 @@
 // Sample metrics approved for the initial layout.
 // Replace these figures with verified totals before publishing.
 export const profile = {
+  email: "nidadigital23@gmail.com",
+  resumeUrl: "/documents/nida-maryam-cv.pdf",
   stats: [
     { label: "projects", value: "20+" },
     { label: "clients", value: "10+" },

@@ -1,4 +1,5 @@
 import Image, { type StaticImageData } from "next/image";
+import { profile } from "@/lib/profile";
 import omasLogo from "../../public/brands/Omas Cafeteria.jpeg";
 import rimsLogo from "../../public/brands/rims.png";
 import urbanhubLogo from "../../public/brands/uhb.jpeg";
@@ -127,23 +128,19 @@ export function ProfileIntro({
         </section>
 
         <div className="mt-2.5 grid grid-cols-2 gap-2 pb-3">
-          {/* Destinations will be enabled when the CV and email are supplied. */}
-          <button
-            type="button"
-            disabled
-            title="CV will be added later"
-            className="flex min-h-11 items-center justify-center rounded-xl bg-[#4a5df9] px-3 py-[13px] text-center font-semibold whitespace-nowrap text-white disabled:cursor-default sm:px-5"
+          <a
+            href={profile.resumeUrl}
+            download="Nida-Maryam-CV.pdf"
+            className="flex min-h-11 items-center justify-center rounded-xl bg-[#4a5df9] px-3 py-[13px] text-center font-semibold whitespace-nowrap text-white hover:bg-[#4052df] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent-text sm:px-5"
           >
             Download CV
-          </button>
-          <button
-            type="button"
-            disabled
-            title="Email address will be added later"
-            className="flex min-h-11 items-center justify-center rounded-xl bg-[#25292e] px-3 py-[13px] text-center font-semibold whitespace-nowrap text-white disabled:cursor-default sm:px-5"
+          </a>
+          <a
+            href={`mailto:${profile.email}`}
+            className="flex min-h-11 items-center justify-center rounded-xl bg-[#25292e] px-3 py-[13px] text-center font-semibold whitespace-nowrap text-white hover:bg-[#30353c] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent-text sm:px-5"
           >
             Get in touch
-          </button>
+          </a>
         </div>
       </div>
     </section>

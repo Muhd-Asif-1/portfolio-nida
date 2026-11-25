@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { profile } from "@/lib/profile";
 
 export function SiteHeader() {
   return (
@@ -24,25 +25,21 @@ export function SiteHeader() {
           />
         </Link>
         <div className="flex items-center gap-2 sm:gap-4">
-          {/* Enable these actions once the contact link and resume are supplied. */}
-          <button
-            type="button"
-            disabled
-            title="Contact link will be added later"
-            className="flex min-h-11 items-center disabled:cursor-default"
+          <a
+            href={`mailto:${profile.email}`}
+            className="flex min-h-11 items-center rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent-text"
           >
             <span className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold leading-4 text-white">
               Contact
             </span>
-          </button>
-          <button
-            type="button"
-            disabled
-            title="Resume will be added later"
-            className="min-h-11 text-sm text-[#85a1ff] disabled:cursor-default"
+          </a>
+          <a
+            href={profile.resumeUrl}
+            download="Nida-Maryam-CV.pdf"
+            className="flex min-h-11 items-center rounded-sm text-sm text-[#85a1ff] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent-text"
           >
             Resume
-          </button>
+          </a>
         </div>
       </nav>
     </header>
