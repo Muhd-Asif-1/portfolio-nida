@@ -1,5 +1,6 @@
 import Image, { type StaticImageData } from "next/image";
 import { NumberTicker } from "@/components/number-ticker";
+import { ProfileTextReveal } from "@/components/profile-text-reveal";
 import { WorkedWithAvatars } from "@/components/worked-with-avatars";
 import { profile } from "@/lib/profile";
 
@@ -21,10 +22,7 @@ export function ProfileIntro({
   dashboardServices,
 }: ProfileIntroProps) {
   return (
-    <section
-      aria-labelledby="profile-name"
-      className="mx-auto my-10 grid w-[calc(100%-40px)] max-w-[680px] grid-cols-[88px_minmax(0,1fr)] items-center gap-x-5 gap-y-5 text-sm leading-[18px] tracking-[-0.1504px] sm:my-14 sm:w-[calc(100%-64px)] sm:grid-cols-[150px_minmax(0,1fr)] sm:gap-x-7 sm:gap-y-0"
-    >
+    <ProfileTextReveal className="mx-auto my-10 grid w-[calc(100%-40px)] max-w-[680px] grid-cols-[88px_minmax(0,1fr)] items-center gap-x-5 gap-y-5 text-sm leading-[18px] tracking-[-0.1504px] sm:my-14 sm:w-[calc(100%-64px)] sm:grid-cols-[150px_minmax(0,1fr)] sm:gap-x-7 sm:gap-y-0">
       <div className="relative aspect-square overflow-hidden rounded-full bg-profile-surface sm:row-span-2">
         <Image
           src={photo}
@@ -40,6 +38,7 @@ export function ProfileIntro({
       <div className="min-w-0 sm:self-start sm:pt-4">
         <h1
           id="profile-name"
+          data-text-reveal
           className="flex min-h-8 items-center text-2xl font-bold leading-[30px] tracking-[0.0703px]"
         >
           Nida Maryam
@@ -60,7 +59,12 @@ export function ProfileIntro({
         <p className="text-profile-muted">
           Social Media Marketer | Content Creator | Administrative Assistant
         </p>
-        <p className="mt-1 whitespace-pre-line text-foreground">{bio}</p>
+        <p
+          data-text-reveal
+          className="mt-1 whitespace-pre-line text-foreground"
+        >
+          {bio}
+        </p>
         <div className="flex items-center pb-1 pt-[14px]">
           <WorkedWithAvatars />
           <p className="min-w-0">
@@ -100,7 +104,7 @@ export function ProfileIntro({
           </h2>
           <dl className="mt-2 space-y-1.5 text-sm leading-5">
             {dashboardServices.map(({ title, description }) => (
-              <div key={title}>
+              <div key={title} data-text-reveal>
                 <dt className="inline font-semibold">{title}: </dt>
                 <dd className="inline text-[#a8a8a8]">{description}</dd>
               </div>
@@ -124,6 +128,6 @@ export function ProfileIntro({
           </a>
         </div>
       </div>
-    </section>
+    </ProfileTextReveal>
   );
 }
