@@ -4,7 +4,7 @@ import portrait from "../../public/nida_portrait.jpeg";
 
 export default function Home() {
   return (
-    <main aria-label="Nida Maryam’s portfolio" className="flex-1">
+    <main aria-label="Nida Maryam’s portfolio" className="flex-1 pl-16 lg:pl-0">
       <ProfileIntro
         photo={portrait}
         stats={profile.stats}
