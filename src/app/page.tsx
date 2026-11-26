@@ -1,4 +1,6 @@
+import { ProfileHighlights } from "@/components/profile-highlights";
 import { ProfileIntro } from "@/components/profile-intro";
+import { highlights } from "@/lib/highlights";
 import { profile } from "@/lib/profile";
 import portrait from "../../public/nida_portrait.jpeg";
 
@@ -11,6 +13,7 @@ export default function Home() {
         bio={profile.bio}
         dashboardServices={profile.dashboardServices}
       />
+      <ProfileHighlights highlights={highlights} />
     </main>
   );
 }

@@ -22,7 +22,7 @@ export function ProfileIntro({
   dashboardServices,
 }: ProfileIntroProps) {
   return (
-    <ProfileTextReveal className="mx-auto my-10 grid w-[calc(100%-40px)] max-w-[680px] grid-cols-[88px_minmax(0,1fr)] items-center gap-x-5 gap-y-5 text-sm leading-[18px] tracking-[-0.1504px] sm:my-14 sm:w-[calc(100%-64px)] sm:grid-cols-[150px_minmax(0,1fr)] sm:gap-x-7 sm:gap-y-0">
+    <ProfileTextReveal className="mx-auto mb-6 mt-10 grid w-[calc(100%-40px)] max-w-[680px] grid-cols-[88px_minmax(0,1fr)] items-center gap-x-5 gap-y-5 text-sm leading-[18px] tracking-[-0.1504px] sm:mt-14 sm:w-[calc(100%-64px)] sm:grid-cols-[150px_minmax(0,1fr)] sm:gap-x-7 sm:gap-y-0">
       <div className="relative aspect-square overflow-hidden rounded-full bg-profile-surface sm:row-span-2">
         <Image
           src={photo}
