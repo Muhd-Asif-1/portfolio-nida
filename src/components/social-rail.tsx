@@ -20,7 +20,7 @@ const socials = [
   },
   {
     name: "LinkedIn",
-    href: "https://www.linkedin.com/in/nida-maryam",
+    href: "https://www.linkedin.com/in/nida-maryam-",
     Icon: LinkedinIcon,
   },
   {
