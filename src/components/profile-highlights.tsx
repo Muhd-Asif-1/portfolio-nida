@@ -16,8 +16,10 @@ import {
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { HighlightBackground } from "@/components/highlight-background";
-import type { Highlight } from "@/lib/highlights";
+import { StoryContent } from "@/components/story-content";
+import type { Highlight, HighlightStory } from "@/lib/highlights";
 import { profile } from "@/lib/profile";
+import { storyThemes } from "@/lib/story-themes";
 
 const focusStyle =
   "focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent-text";
@@ -45,28 +47,51 @@ function Icon({ name }: { name: keyof typeof controlIcons }) {
   );
 }
 
+function readingDuration(story: HighlightStory) {
+  const copy = [
+    story.title,
+    story.lead,
+    ...story.texts,
+    story.itemsLabel,
+    ...(story.items ?? []),
+    story.footer,
+    ...(story.logos?.map((logo) => logo.name) ?? []),
+  ]
+    .filter(Boolean)
+    .join(" ");
+  return Math.max(10, 3 + Math.ceil(copy.trim().split(/\s+/u).length / 3));
+}
+
+function storyStyle(story: HighlightStory) {
+  return story.theme
+    ? { ...storyThemes[story.theme], color: "var(--story-ink)" }
+    : undefined;
+}
+
 function StoryProgress({
   playing,
   onComplete,
+  duration,
 }: {
   playing: boolean;
   onComplete: () => void;
+  duration: number;
 }) {
   const progress = useMotionValue(0);
 
   useEffect(() => {
     if (!playing) return;
     const controls = animate(progress, 1, {
-      duration: (1 - progress.get()) * 8,
+      duration: (1 - progress.get()) * duration,
       ease: "linear",
       onComplete,
     });
     return () => controls.stop();
-  }, [playing, progress, onComplete]);
+  }, [playing, progress, onComplete, duration]);
 
   return (
     <motion.span
-      className="absolute inset-0 origin-left rounded-full bg-white"
+      className="absolute inset-0 origin-left rounded-full bg-current"
       style={{ scaleX: progress }}
     />
   );
@@ -81,9 +106,10 @@ function StoryViewer({
   initialHighlight: number;
   onClose: () => void;
 }) {
-  const slides = highlights.flatMap((highlight) =>
+  const slides = highlights.flatMap((highlight, highlightIndex) =>
     highlight.stories.map((story, storyIndex) => ({
       highlight,
+      highlightIndex,
       story,
       storyIndex,
     })),
@@ -103,6 +129,9 @@ function StoryViewer({
   const active = slides[index];
   const previous = slides[index - 1];
   const next = slides[index + 1];
+  const groupStart = index - active.storyIndex;
+  const previousGroup = highlights[active.highlightIndex - 1];
+  const nextGroup = highlights[active.highlightIndex + 1];
   const advance = useCallback(() => {
     if (index === slides.length - 1) onClose();
     else setIndex((current) => current + 1);
@@ -163,20 +192,23 @@ function StoryViewer({
       }}
     >
       <div className="grid h-full grid-cols-1 items-center justify-center gap-5 px-0 sm:px-16 lg:grid-cols-[1fr_auto_1fr] lg:gap-8">
-        {previous && (
+        {previousGroup && (
           <button
             type="button"
-            aria-label={`Previous story: ${previous.story.title}`}
-            onClick={() => setIndex(index - 1)}
+            aria-label={`Open ${previousGroup.title} highlight group`}
+            style={storyStyle(previousGroup.stories[0])}
+            onClick={() => setIndex(groupStart - previousGroup.stories.length)}
             className={`relative col-start-1 row-start-1 hidden aspect-9/16 w-[min(15vw,208px)] justify-self-end overflow-hidden rounded-lg opacity-40 hover:opacity-65 lg:block ${focusStyle}`}
           >
             <HighlightBackground
-              background={previous.story.background}
+              background={previousGroup.stories[0].background}
               sizes="208px"
             />
-            <span className="absolute inset-0 bg-black/30" />
+            <span
+              className={`absolute inset-0 ${previousGroup.stories[0].theme ? "bg-white/10" : "bg-black/30"}`}
+            />
             <span className="absolute inset-x-3 top-1/2 -translate-y-1/2 text-center text-sm font-semibold">
-              {previous.story.title}
+              {previousGroup.title}
             </span>
           </button>
         )}
@@ -192,14 +224,20 @@ function StoryViewer({
             <Icon name="previous" />
           </button>
 
-          <article className="relative isolate h-full w-screen overflow-hidden bg-profile-surface sm:h-[min(920px,calc(100dvh-48px),calc((100vw-128px)*16/9))] sm:w-auto sm:aspect-9/16 sm:rounded-lg">
+          <article
+            data-story-theme={active.story.theme}
+            style={storyStyle(active.story)}
+            className="relative isolate h-full w-screen overflow-hidden bg-profile-surface sm:h-[min(920px,calc(100dvh-48px),calc((100vw-128px)*16/9))] sm:w-auto sm:aspect-9/16 sm:rounded-lg"
+          >
             <div className="pointer-events-none absolute inset-0 -z-20">
               <HighlightBackground
                 background={active.story.background}
                 sizes="(min-width: 640px) 520px, 100vw"
               />
             </div>
-            <div className="pointer-events-none absolute inset-0 -z-10 bg-linear-to-b from-black/65 via-black/30 to-black/75" />
+            {!active.story.theme && (
+              <div className="pointer-events-none absolute inset-0 -z-10 bg-linear-to-b from-black/65 via-black/30 to-black/75" />
+            )}
 
             <div className="px-4 pt-[max(16px,env(safe-area-inset-top))]">
               <nav
@@ -219,15 +257,16 @@ function StoryViewer({
                     }
                     className={`group flex h-5 flex-1 items-center ${focusStyle}`}
                   >
-                    <span className="relative h-0.5 w-full overflow-hidden rounded-full bg-white/35">
+                    <span className="relative h-0.5 w-full overflow-hidden rounded-full bg-current/25">
                       {storyIndex < active.storyIndex && (
-                        <span className="absolute inset-0 bg-white" />
+                        <span className="absolute inset-0 bg-current" />
                       )}
                       {storyIndex === active.storyIndex && (
                         <StoryProgress
                           key={`${active.highlight.id}-${story.id}`}
                           playing={playing && visible}
                           onComplete={advance}
+                          duration={readingDuration(active.story)}
                         />
                       )}
                     </span>
@@ -249,7 +288,7 @@ function StoryViewer({
                   type="button"
                   aria-label={playing ? "Pause stories" : "Play stories"}
                   onClick={() => setPlayback(playing ? "pause" : "play")}
-                  className={`flex size-11 shrink-0 items-center justify-center rounded-full hover:bg-white/10 ${focusStyle}`}
+                  className={`flex size-11 shrink-0 items-center justify-center rounded-full hover:bg-current/10 ${focusStyle}`}
                 >
                   <Icon name={playing ? "pause" : "play"} />
                 </button>
@@ -258,15 +297,20 @@ function StoryViewer({
                   type="button"
                   aria-label="Close stories"
                   onClick={onClose}
-                  className={`flex size-11 shrink-0 items-center justify-center rounded-full hover:bg-white/10 ${focusStyle}`}
+                  className={`flex size-11 shrink-0 items-center justify-center rounded-full hover:bg-current/10 ${focusStyle}`}
                 >
                   <Icon name="close" />
                 </button>
               </div>
             </div>
 
-            <div
-              className={`absolute inset-x-0 bottom-28 top-28 overflow-y-auto px-7 py-4 sm:px-10 ${active.story.textAlign === "left" ? "text-left" : "text-center"}`}
+            <section
+              key={`${active.highlight.id}-${active.story.id}`}
+              aria-label="Story content"
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: Keyboard users need to scroll this region on short screens.
+              tabIndex={0}
+              onFocus={() => setPlayback("pause")}
+              className={`story-scroll absolute inset-x-0 bottom-24 top-24 overflow-y-auto px-6 py-5 sm:px-8 ${active.story.textAlign === "left" ? "text-left" : "text-center"}`}
               style={{ color: active.story.textColor }}
             >
               <div className="flex min-h-full flex-col justify-center">
@@ -274,21 +318,12 @@ function StoryViewer({
                   {active.highlight.title}, story {active.storyIndex + 1} of{" "}
                   {active.highlight.stories.length}
                 </p>
-                <h2 className="text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
-                  {active.story.title}
-                </h2>
-                <div className="mt-6 space-y-5 text-lg leading-relaxed sm:text-xl">
-                  {active.story.texts.map((text, textIndex) => (
-                    <p
-                      key={`${textIndex}-${text}`}
-                      className="whitespace-pre-line"
-                    >
-                      {text}
-                    </p>
-                  ))}
-                </div>
+                <StoryContent
+                  story={active.story}
+                  label={active.highlight.title}
+                />
               </div>
-            </div>
+            </section>
 
             <div className="absolute inset-x-0 bottom-0 flex items-center gap-3 px-4 pb-[max(20px,env(safe-area-inset-bottom))] pt-4">
               <button
@@ -296,13 +331,13 @@ function StoryViewer({
                 aria-label="Previous story"
                 disabled={!previous}
                 onClick={() => setIndex(index - 1)}
-                className={`flex size-11 shrink-0 items-center justify-center rounded-full border border-white/50 disabled:opacity-30 sm:hidden ${focusStyle}`}
+                className={`flex size-11 shrink-0 items-center justify-center rounded-full border border-current/50 disabled:opacity-30 sm:hidden ${focusStyle}`}
               >
                 <Icon name="previous" />
               </button>
               <a
                 href={`mailto:${profile.email}`}
-                className={`flex min-h-11 flex-1 items-center rounded-full border border-white/60 px-5 text-sm hover:bg-white/10 ${focusStyle}`}
+                className={`flex min-h-11 flex-1 items-center rounded-full border border-current/60 px-5 text-sm hover:bg-current/10 ${focusStyle}`}
               >
                 Get in touch
               </a>
@@ -310,7 +345,7 @@ function StoryViewer({
                 type="button"
                 aria-label={next ? "Next story" : "Finish stories"}
                 onClick={advance}
-                className={`flex size-11 shrink-0 items-center justify-center rounded-full border border-white/50 sm:hidden ${focusStyle}`}
+                className={`flex size-11 shrink-0 items-center justify-center rounded-full border border-current/50 sm:hidden ${focusStyle}`}
               >
                 <Icon name="next" />
               </button>
@@ -327,20 +362,25 @@ function StoryViewer({
           </button>
         </div>
 
-        {next && (
+        {nextGroup && (
           <button
             type="button"
-            aria-label={`Next story: ${next.story.title}`}
-            onClick={advance}
+            aria-label={`Open ${nextGroup.title} highlight group`}
+            style={storyStyle(nextGroup.stories[0])}
+            onClick={() =>
+              setIndex(groupStart + active.highlight.stories.length)
+            }
             className={`relative col-start-3 row-start-1 hidden aspect-9/16 w-[min(15vw,208px)] overflow-hidden rounded-lg opacity-40 hover:opacity-65 lg:block ${focusStyle}`}
           >
             <HighlightBackground
-              background={next.story.background}
+              background={nextGroup.stories[0].background}
               sizes="208px"
             />
-            <span className="absolute inset-0 bg-black/30" />
+            <span
+              className={`absolute inset-0 ${nextGroup.stories[0].theme ? "bg-white/10" : "bg-black/30"}`}
+            />
             <span className="absolute inset-x-3 top-1/2 -translate-y-1/2 text-center text-sm font-semibold">
-              {next.story.title}
+              {nextGroup.title}
             </span>
           </button>
         )}
@@ -366,7 +406,7 @@ export function ProfileHighlights({
     >
       <ul className="flex gap-3 overflow-x-auto px-1 py-2 [scrollbar-width:none] sm:gap-5">
         {highlights.map((highlight, index) => (
-          <li key={highlight.id} className="w-[95px] shrink-0 sm:w-[105px]">
+          <li key={highlight.id} className="w-[95px] shrink-0">
             <button
               type="button"
               aria-label={`Open ${highlight.title} highlight`}
